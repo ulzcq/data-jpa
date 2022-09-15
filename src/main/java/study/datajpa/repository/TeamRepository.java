@@ -1,7 +1,7 @@
 package study.datajpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
 /**
  * 공통 인터페이스
@@ -12,5 +12,5 @@ import study.datajpa.entity.Member;
  * - JpaRepository 인터페이스: 공통 CRUD 제공
  * - 제네릭 <엔티티타입, 식별자타입> 설정
  */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface TeamRepository extends JpaRepository<Team, Long> {
 }
