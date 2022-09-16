@@ -4,6 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -156,5 +159,35 @@ public class MemberRepositoryTest {
         //클라이언트는 스프링이 추상화한 예외에 의존하면 리포지토리 기술을 바꿔도 클라이언트 코드를 바꿀 필요가 없다
         Optional<Member> findMember3 = memberRepository.findOptionalByUsername("AAA");
         System.out.println("findMember3 = " + findMember3); //orElse...등으로 분기!
+    }
+
+    //페이징 조건과 정렬 조건 설정
+    @Test
+    public void page() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        //when
+        /** 주의: Page는 0부터 시작 */
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        Page<Member> page = memberRepository.findByAge(10, pageRequest);
+
+        /** 페이지를 유지하면서 엔티티를 DTO로 변환하기
+         * - 특히 API 에서는 외부에 엔티티를 노출하면 안된다 */
+        page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        //then
+        List<Member> content = page.getContent(); //조회된 데이터
+
+        assertThat(content.size()).isEqualTo(3); //조회된 데이터 수
+        assertThat(page.getTotalElements()).isEqualTo(5); //전체 데이터 수
+        assertThat(page.getNumber()).isEqualTo(0); //페이지 번호
+        assertThat(page.getTotalPages()).isEqualTo(2); //전체 페이지 번호
+        assertThat(page.isFirst()).isTrue(); //첫번째 항목인가?
+        assertThat(page.hasNext()).isTrue(); //다음 페이지가 있는가?
     }
 }
