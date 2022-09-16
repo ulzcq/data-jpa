@@ -1,9 +1,14 @@
 package study.datajpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 공통 인터페이스
@@ -15,5 +20,24 @@ import java.util.List;
  * - 제네릭 <엔티티타입, 식별자타입> 설정
  */
 public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    /** 메서드 이름으로 쿼리 생성 */
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
+
+    /**
+     * @Query로 리포지토리 메소드에 쿼리 정의하기, @Param으로 파라미터 바인딩
+     * - 실행할 메서드에 정적 쿼리를 직접 작성. App 실행시점에 오류 발견 가능한 장점
+     * - 실무에서 많이 사용!
+     */
+    @Query("select m from Member m where m.username= :username and m.age = :age")
+    List<Member> findUser(@Param("username") String username, @Param("age") int age);
+
+    @Query("select m.username from Member m")
+    List<String> findUsernameList();
+
+    /** DTO로 직접 조회 시, JPA의 new 명령어 사용 */
+    @Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) " +
+            "from Member m join m.team t")
+    List<MemberDto> findMemberDto();
+
 }
