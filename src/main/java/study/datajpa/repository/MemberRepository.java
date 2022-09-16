@@ -40,4 +40,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "from Member m join m.team t")
     List<MemberDto> findMemberDto();
 
+    /**
+     * 컬렉션 파라미터 바인딩 : Collection 타입으로 in절 지원
+     * - List말고 Collection으로 받으면 다른 애들도 받을 수 있음
+     * - 실무에서 은근 많이 씀!
+     */
+    @Query("select m from Member m where m.username in :names")
+    List<Member> findByNames(@Param("names") Collection<String> names);
+
+    /** 다양한 반환타입 제공 */
+    List<Member> findListByUsername(String username); //컬렉션
+    Member findMemberByUsername(String username); //단건
+    Optional<Member> findOptionalByUsername(String name); //단건 Optional
 }

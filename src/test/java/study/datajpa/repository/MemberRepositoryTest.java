@@ -117,4 +117,44 @@ public class MemberRepositoryTest {
             System.out.println("dto = " + dto);
         }
     }
+
+    @Test
+    public void findByNames  (){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("AAA", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> result = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+        for (Member member : result) {
+            System.out.println("member = " + member);
+        }
+    }
+
+    @Test
+    public void returnType(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("AAA", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        //컬렉션 조회 시 결과가 하나도 없으면 EmptyCollection이 반환된다 (null 체크 안해도 됨)
+        List<Member> result = memberRepository.findListByUsername("asdfsdf");
+        System.out.println("result = " + result.size());
+
+        //단건 일때 결과가 없으면 null (체크 필수)
+        //순수 JPA는 NoResultException을 터트리지만, 스프링 JPA는 null 반환
+        Member findMember = memberRepository.findMemberByUsername("asdfsdf");
+        System.out.println("findMember = " + findMember);
+
+        //실무에서는 Optional을 쓰자!
+        Optional<Member> findMember2 = memberRepository.findOptionalByUsername("asdfsdf");
+        System.out.println("findMember2 = " + findMember2); //orElse...등으로 분기!
+
+        //한 건 조회인데 결과가 여러 개이면
+        //NoUniqueResultException -> 스프링 예외(IncorrectResultSizeDataAccessException)로 바뀌어서 나옴
+        //클라이언트는 스프링이 추상화한 예외에 의존하면 리포지토리 기술을 바꿔도 클라이언트 코드를 바꿀 필요가 없다
+        Optional<Member> findMember3 = memberRepository.findOptionalByUsername("AAA");
+        System.out.println("findMember3 = " + findMember3); //orElse...등으로 분기!
+    }
 }
