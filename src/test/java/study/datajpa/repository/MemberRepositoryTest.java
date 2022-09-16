@@ -245,4 +245,30 @@ public class MemberRepositoryTest {
             System.out.println("member.team = " + member.getTeam().getName());
         }
     }
+
+    @Test
+    public void queryHint() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+        Member member = memberRepository.findReadOnlyByUsername("member1");
+        member.setUsername("member2");
+        em.flush(); //Update Query 실행X (스냅샷 없어서 더티체킹 안됨)
+    }
+
+
+    @Test
+    public void lock() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> result = memberRepository.findLockByUsername("member1");
+    }
+
 }
