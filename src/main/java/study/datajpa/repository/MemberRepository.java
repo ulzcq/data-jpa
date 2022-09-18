@@ -109,4 +109,15 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUsername(String name);
+
+    /** Projections */
+    //인터페이스 기반 Projections(구현체에 프록시 객체가 담긴다)
+    List<UsernameOnly> findProjectionsByUsername(String username);
+    List<NestedClosedProjection> findProjections1ByUsername(String username);
+
+    //클래스 기반 Projections(구현체에 프록시 객체가 담긴다)
+    List<UsernameOnlyDto> findProjections2ByUsername(String username);
+
+    //동적 Projections (Generic type을 주면, 동적으로 프로젝션 데이터 번경 가능)
+    <T> List<T> findProjections3ByUsername(String username, Class<T> type);
 }
