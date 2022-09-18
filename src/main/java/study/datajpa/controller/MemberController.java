@@ -1,9 +1,14 @@
 package study.datajpa.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.repository.MemberRepository;
 
@@ -35,8 +40,23 @@ public class MemberController {
         return member.getUsername();
     }
 
+    /** 페이징과 정렬 예제
+     * - 파라미터로 Pageable 을 받을 수 있다.
+     * - Pageable 은 인터페이스, 실제는 org.springframework.data.domain.PageRequest 객체 생성
+     * - 글로벌 설정: application.yml 설정
+     * - 개별 설정 : @PageableDefault 사용
+     */
+    @GetMapping("/members")
+    public Page<MemberDto> list(@PageableDefault(size = 5, sort = "username", direction = Sort.Direction.DESC) Pageable pageable) {
+        //Page 내용을 DTO로 변환하기
+        return memberRepository.findAll(pageable)
+                .map(MemberDto::new);
+    }
+
     @PostConstruct
     public void init(){
-        memberRepository.save(new Member("userA"));
+        for(int i=0; i<100; i++){
+            memberRepository.save(new Member("user" + i , i));
+        }
     }
 }
