@@ -120,4 +120,28 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     //동적 Projections (Generic type을 주면, 동적으로 프로젝션 데이터 번경 가능)
     <T> List<T> findProjections3ByUsername(String username, Class<T> type);
+
+    /**
+     * 네이티브 쿼리
+     * - 페이징 지원
+     * 한계(제약이 너무 많다)
+     * - 엔티티를 가져올 때는 데이터를 entity에 맞게 select 절에 다 적어줘야한다, Member 데이터를 다 찍어야한다
+     * - 반환 타입이 몇가지 지원 안된다 (보통 엮어서 가져올 때 필요한데 ㅠ)
+     * - Sort 파라미터를 통한 정렬이 정상 동작하지 않을 수 있음
+     * - 로딩 시점에 문법 확인 불가
+     * - 동적 쿼리 불가
+     */
+    @Query(value = "select * from member where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String username);
+
+    /**
+     * Projections 활용 (New!)
+     * 예) 스프링 데이터 JPA 네이티브 쿼리 + 인터페이스 기반 Projections 활용
+     * - 안시 SQL 표준 문법
+     */
+    @Query(value = "SELECT m.member_id as id, m.username, t.name as teamName " +
+            "FROM member m left join team t",
+            countQuery = "SELECT count(*) from member", //꼭 적어야함
+            nativeQuery = true)
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 }
