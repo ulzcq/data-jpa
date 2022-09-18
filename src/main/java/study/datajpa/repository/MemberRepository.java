@@ -24,7 +24,7 @@ import java.util.Optional;
  * - JpaRepository 인터페이스: 공통 CRUD 제공
  * - 제네릭 <엔티티타입, 식별자타입> 설정
  */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     /** 메서드 이름으로 쿼리 생성 */
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
