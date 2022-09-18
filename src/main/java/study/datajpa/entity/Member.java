@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"}) //출력하기 편하려고 넣음(*주의 연관관계 필드는 가급적 넣지X, 무한루프..)
-public class Member {
+public class Member extends JpaBaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id") //조인할 때 편함, 관례!
